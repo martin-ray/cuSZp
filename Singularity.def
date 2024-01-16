@@ -1,0 +1,32 @@
+Bootstrap: docker
+From: nvidia/cuda:12.1.1-devel-ubuntu22.04
+
+%post
+    apt-get update && \
+    apt-get install -y curl cmake git g++ pkg-config protobuf-compiler libprotobuf-dev libzstd-dev python3 python3-dev python3-pip vim \
+    hdf5-tools hdf5-helpers libhdf5-dev libhdf5-doc libhdf5-serial-dev libboost-all-dev libhdf5-dev
+
+    curl -sL https://developer.download.nvidia.com/compute/nvcomp/2.6.1/local_installers/nvcomp_2.6.1_x86_64_12.x.tgz | tar xzvf - --directory=/usr/local
+
+    pip3 install numpy
+    pip3 install tiledb
+    pip3 install h5py
+
+    git clone https://github.com/BlueBrain/HighFive.git
+    cd HighFive
+    mkdir build && cd build
+    cmake ..
+    make install
+
+    cd ../../
+    git clone https://github.com/szcompressor/cuSZp.git
+    cd cuSZp
+    mkdir build && cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DBUILD_SHARED_LIBS=ON ..
+    make -j
+    make install
+
+
+%environment
+    export PYTHONPATH=/MGARD/build/lib

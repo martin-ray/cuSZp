@@ -15,6 +15,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(MGARD_ENABLE_PYTHON "Enable Python bindings." OFF)
+
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -debug -Wall -diag-disable=10441")
 #set(CMAKE_CXX_FLAGS_RELEASE "-diag-disable=10441 -g -ftz -fma -O2 -fp-model precise -prec-div -Wall")
 
@@ -34,7 +36,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE Release)
 endif()
 
-add_library(${PROJECT_NAME} STATIC)
+# add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME}
         PRIVATE
@@ -72,6 +75,22 @@ set(public_headers
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Installing)
+
+if(MGARD_ENABLE_PYTHON)
+  find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+
+  include(FetchContent)
+  FetchContent_Declare(
+      pybind11
+      GIT_REPOSITORY https://github.com/pybind/pybind11.git
+      GIT_TAG        stable
+  )
+  FetchContent_MakeAvailable(pybind11)
+
+  pybind11_add_module(_cuSZp src/python/bindings.cpp)
+  target_link_libraries(_cuSZp PRIVATE mgard-library)
+  install(TARGETS _cuSZp LIBRARY DESTINATION python/mgard)
+endif()
 
 option(CUSZP_BUILD_EXAMPLES "Option to enable building example programs" ON)
 if (CUSZP_BUILD_EXAMPLES)

@@ -15,19 +15,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(MGARD_ENABLE_PYTHON "Enable Python bindings." OFF)
-
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -debug -Wall -diag-disable=10441")
-#set(CMAKE_CXX_FLAGS_RELEASE "-diag-disable=10441 -g -ftz -fma -O2 -fp-model precise -prec-div -Wall")
-
-#set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -g -ftz=true -G -allow-unsupported-compiler")
-#set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -allow-unsupported-compiler")
+option(CUSZP_ENABLE_PYTHON "Enable Python bindings." OFF)
 
 set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
 set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
 set(CMAKE_CUDA_STANDARD "17")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_CUDA_FLAGS_INIT "-std=c++17 -allow-unsupported-compiler")
 set(CMAKE_CUDA_ARCHITECTURES 60 61 62 70 75)
 set(CUDA_PROPAGATE_HOST_FLAGS ON)
 set(CUDA_LIBRARY CUDA::cudart)
@@ -76,10 +69,10 @@ set(public_headers
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Installing)
 
-if(MGARD_ENABLE_PYTHON)
-  find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+if(CUSZP_ENABLE_PYTHON)
+  find_package(Python COMPONENTS Interpreter Development.Module REQUIRED) # よく出てくる。ライブラリがあるかを確認。
 
-  include(FetchContent)
+  include(FetchContent) # 便利
   FetchContent_Declare(
       pybind11
       GIT_REPOSITORY https://github.com/pybind/pybind11.git
@@ -87,9 +80,9 @@ if(MGARD_ENABLE_PYTHON)
   )
   FetchContent_MakeAvailable(pybind11)
 
-  pybind11_add_module(_cuSZp src/python/bindings.cpp)
-  target_link_libraries(_cuSZp PRIVATE mgard-library)
-  install(TARGETS _cuSZp LIBRARY DESTINATION python/mgard)
+  pybind11_add_module(_cuSZp src/python/bindings.cpp) # ここで作成するライブラリを指定。add_libraryてきなののpybind版
+  target_link_libraries(_cuSZp PRIVATE cuSZp)
+  install(TARGETS _cuSZp LIBRARY DESTINATION python/cuSZp)
 endif()
 
 option(CUSZP_BUILD_EXAMPLES "Option to enable building example programs" ON)

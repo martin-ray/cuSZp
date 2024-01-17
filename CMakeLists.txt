@@ -84,8 +84,18 @@ if(CUSZP_ENABLE_PYTHON)
   FetchContent_MakeAvailable(pybind11)
 
   pybind11_add_module(_cuSZp src/python/bindings.cpp) # ここで作成するライブラリを指定。add_libraryてきなののpybind版
-  target_include_directories(_cuSZp  PRIVATE "/usr/local/cuda/include")
-  target_link_libraries(_cuSZp PRIVATE cuSZp)
+  target_include_directories(_cuSZp PRIVATE "/usr/local/cuda/include")
+  target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        # where the library itself will look for its internal headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        PUBLIC
+        # where top-level project will look for the library's public headers
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        # where external projects will look for the library's public headers
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        )
+  target_link_libraries(_cuSZp PRIVATE cuSZp CUDA::cudart)
   install(TARGETS _cuSZp LIBRARY DESTINATION python/cuSZp)
 endif()
 

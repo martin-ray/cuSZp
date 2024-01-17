@@ -17,11 +17,11 @@ py::buffer compress(py::array_t<float> original, float tol) {
 
     // Convert the NumPy array to a C++ vector of float
     std::vector<float> original_data(original.data(), original.data() + original.size());
-    
+
     compressed_data = new unsigned char[original.size()];
 
-    // pointer_to_original_data, pointer_to_compressed_data, size_of_original_data, pointer_to_compressed_size, tolerance
-    SZp_compress_hostptr_f32(original.data(), compressed_data, original.size(), &compressed_size, tol);
+    // pointer_to_original_data(float*), pointer_to_compressed_data(unsigned char*), size_of_original_data(int/size_t), pointer_to_compressed_size, tolerance
+    SZp_compress_hostptr_f32(original_data.data(), compressed_data, original.size(), &compressed_size, tol);
     
     return py::array_t<unsigned char>({static_cast<pybind11::ssize_t>(compressed_size)},
                                       reinterpret_cast<unsigned char *>(compressed_data)); // メモリリークする

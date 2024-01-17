@@ -72,6 +72,8 @@ include(Installing)
 if(CUSZP_ENABLE_PYTHON)
   find_package(Python COMPONENTS Interpreter Development.Module  REQUIRED) # よく出てくる。ライブラリがあるかを確認。cmakeがいい感じにいろいろやってくれる
   find_package(CUDAToolkit REQUIRED)
+  enable_language(CUDA)
+  set(CUDA_LIBRARY CUDA::cudart)
   
   include(FetchContent) # 便利
   FetchContent_Declare(

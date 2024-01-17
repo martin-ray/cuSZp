@@ -27,29 +27,35 @@ py::buffer compress(py::array_t<float> original, float tol) {
 
 
 
-// py::array_t<float> decompress(py::buffer compressed)
-// {
-//         // cuSZp decompression.
-//     py::buffer_info info = compressed.request();
-//     if (info.format != py::format_descriptor<unsigned char>::format()) {
-//         throw std::invalid_argument("Input must be a byte array");
-//     }
-//     if (info.shape.size() != 1) {
-//         throw std::invalid_argument("Input must be a 1D array");
-//     }
-
-//     decData = (float*)malloc(nbEle*sizeof(float));
-//     SZp_decompress_hostptr_f32(decData, cmpBytes, nbEle, cmpSize, errorBound);
-//     
+py::array_t<float> decompress(py::buffer compressed,size_t originalSize, float tol)
+{
+    // cuSZp decompression.
+    py::buffer_info info = compressed.request();
+    
+    if (info.format != py::format_descriptor<unsigned char>::format()) {
+        throw std::invalid_argument("Input must be a byte array");
+    }
+    if (info.shape.size() != 1) {
+        throw std::invalid_argument("Input must be a 1D array");
+    }
 
 
+    printf("size:%ld,shape:%s",info.size,info.format,info.shape.size());
 
-//     void *decompressed_data = nullptr;
+    size_t cmpSize = info.size;
 
+    float* decompressed_data = nullptr;
+    decompressed_data = (float*)malloc(originalSize*sizeof(float));
+    //(float* decData, unsigned char* cmpBytes, size_t nbEle, size_t cmpSize, float errorBound)
+    //static_cast<unsigned char*>info.ptr
+    SZp_decompress_hostptr_f32(decompressed_data, reinterpret_cast<unsigned char*>(info.ptr), originalSize, cmpSize, tol);
 
-//     return py::array_t<double>(shape, reinterpret_cast<double *>(decompressed_data),
-//                                py::capsule(decompressed_data, [](void *ptr) { delete ptr; }));
-// }
+    return py::array_t<float>({originalSize},
+                            {1},
+                            // reinterpret_cast<float *>(decompressed_data),
+                            static_cast<float *> (decompressed_data),
+                               py::capsule(decompressed_data, [](void *ptr) { delete ptr; }));
+}
 
 PYBIND11_MODULE(_cuSZp, m)
 {
@@ -58,6 +64,7 @@ PYBIND11_MODULE(_cuSZp, m)
     m.def("compress", &compress, "Compress a multi-dimensional array", py::arg("original"),
           py::arg("tol")
           );
-    // m.def("decompress", &decompress, "Decompress a multi-dimensional array", py::arg("compressed"),
-    //       py::arg("config") = mgard_x::Config());
+    m.def("decompress", &decompress, "Decompress a multi-dimensional array", py::arg("compressed"),
+          py::arg("originalSize"),
+          py::arg("tol"));
 }

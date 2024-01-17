@@ -24,7 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_ARCHITECTURES 60 61 62 70 75)
 set(CUDA_PROPAGATE_HOST_FLAGS ON)
 set(CUDA_LIBRARY CUDA::cudart)
-set(CMAKE_CXX_FLAGS "-g -fsanitize=address")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE Release)
@@ -83,7 +82,7 @@ if(CUSZP_ENABLE_PYTHON)
       GIT_TAG        stable
   )
   FetchContent_MakeAvailable(pybind11)
-  set(CMAKE_CXX_FLAGS "-g -fsanitize=address")
+  
   pybind11_add_module(_cuSZp src/python/bindings.cpp) # ここで作成するライブラリを指定。add_libraryてきなののpybind版
   target_include_directories(_cuSZp PRIVATE "/usr/local/cuda/include/" "/usr/local/cuSZp/")
   target_include_directories(${PROJECT_NAME}

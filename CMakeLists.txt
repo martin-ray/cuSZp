@@ -70,8 +70,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(Installing)
 
 if(CUSZP_ENABLE_PYTHON)
-  find_package(Python COMPONENTS Interpreter Development.Module CUDAToolkit REQUIRED) # よく出てくる。ライブラリがあるかを確認。
-
+  find_package(Python COMPONENTS Interpreter Development.Module  REQUIRED) # よく出てくる。ライブラリがあるかを確認。cmakeがいい感じにいろいろやってくれる
+  find_package(CUDAToolkit REQUIRED)
+  
   include(FetchContent) # 便利
   FetchContent_Declare(
       pybind11

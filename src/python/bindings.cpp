@@ -1,5 +1,5 @@
 //#include <compress_x.hpp> // mgardの
-#include <cuSZp_utility.h>
+// #include <cuSZp_utility.h>
 #include <cuSZp_entry_f32.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -14,6 +14,7 @@ py::buffer compress(py::array_t<float> original, float tol)
     size_t compressed_size = 0;
     compressed_data = new unsigned char[original.size()];
 
+    // pointer_to_original_data, pointer_to_compressed_data, size_of_original_data, pointer_to_compressed_size, tolerance
     SZp_compress_hostptr_f32(original.data(), compressed_data, original.size(), &compressed_size, tol);
     
     return py::array_t<unsigned char>({static_cast<pybind11::ssize_t>(compressed_size)},

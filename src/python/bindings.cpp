@@ -14,6 +14,10 @@ py::buffer compress(py::array_t<float> original, float tol) {
 
     unsigned char *compressed_data = nullptr;
     size_t compressed_size = 0;
+
+    // Convert the NumPy array to a C++ vector of float
+    std::vector<float> original_data(original.data(), original.data() + original.size());
+    
     compressed_data = new unsigned char[original.size()];
 
     // pointer_to_original_data, pointer_to_compressed_data, size_of_original_data, pointer_to_compressed_size, tolerance

@@ -84,7 +84,7 @@ if(CUSZP_ENABLE_PYTHON)
   FetchContent_MakeAvailable(pybind11)
 
   pybind11_add_module(_cuSZp src/python/bindings.cpp) # ここで作成するライブラリを指定。add_libraryてきなののpybind版
-  target_include_directories(_cuSZp /usr/local/cuda/)
+  target_include_directories(_cuSZp /usr/local/cuda/include)
   target_link_libraries(_cuSZp PRIVATE cuSZp)
   install(TARGETS _cuSZp LIBRARY DESTINATION python/cuSZp)
 endif()
